@@ -29,7 +29,7 @@ public:
 int main()
 {
     Solution so;
-    vector<int> nums{4};
+    vector<int> nums{4,1,2,5,4,5,4};
     cout<<so.hIndex(nums)<<endl;
 }
 
