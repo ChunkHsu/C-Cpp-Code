@@ -5,54 +5,111 @@
 using namespace std;
 
 // 30. 串联所有单词的子串
-class Solution
-{
+class Solution {
 public:
-    vector<int> findSubstring(string s, vector<string>& words) {
+        vector<int> findSubstring(string s, vector<string>& words) {
+        int m=words.size();
+        int n=words[0].size();
+        int l=s.size();
         vector<int> ans;
-        int m = words.size( );
-        int n = words[0].size( );
-        int l = s.size( );
-        unordered_map<string, int> flag;
-        for (int i = 0;i < m;i++)
-            flag.insert({ words[i], 0 });
-        
-        int wl = m * n;
-        for (int i = 0;i < n;i++)
+        // 初始化map
+        unordered_map<string, int> ht1;
+        for(string ts : words) ht1[ts]++;
+        for(int i=0;i<n;i++)
         {
-            int j = i;
-            while (j<l-wl)
+            int left=i, t=0;
+            unordered_map<string, int> ht2;
+            for(int j=i;j<=l-n;j+=n)
             {
-                int t = j;
-                while (t < wl+j)
+                string sub = s.substr(j,n);
+                if(ht1.count(sub)!=0)// 有key
                 {
-                    string sub = s.substr(t, n);
-                    if (!flag.count(sub))
-                        break;
-                    else
-                        flag[sub]++;
-                    t += n;
+                    ht2[sub]++;
+                    t++;
+                    while(ht2[sub]>ht1[sub]) // 键的数量过多
+                    {
+                        string leftSub = s.substr(left, n);
+                        --ht2[leftSub];
+                        left+=n;
+                        t--;
+                    }
+                    if(t==m) // word数目相等
+                    {
+                        ans.push_back(left);
+                        string leftSub = s.substr(left, n);
+                        --ht2[leftSub];
+                        left+=n;
+                        t--;
+                    }
                 }
-                int isI = 1;
-                for (auto tmp : flag)
-                {
-                    if (tmp.second != 1)
-                        isI = 0;
-                    tmp.second = 0;
+                else{//无 key
+                    ht2.clear();
+                    left=j+n;
+                    t=0;
                 }
-                if (isI) ans.push_back(j);
-                j += wl;
             }
         }
         return ans;
+    }
+};
+class Solution2 {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        int wordLength = words[0].size();
+        int wordCount = words.size();
+        int substringLength = wordLength * wordCount;
+        vector<int> indices;
+        if (s.size() < substringLength) return indices;
+
+        // Build the word frequency map
+        unordered_map<string, int> wordFreq;
+        for (const string& word : words) {
+            ++wordFreq[word];
+        }
+
+        // Slide a window of size substringLength over the string s
+        for (int i = 0; i < wordLength; ++i) {
+            int left = i, count = 0;
+            unordered_map<string, int> seenWords;
+            for (int j = i; j <= s.size() - wordLength; j += wordLength) {
+                string word = s.substr(j, wordLength);
+                // If the word is part of words
+                if (wordFreq.find(word) != wordFreq.end()) {
+                    ++seenWords[word];
+                    ++count;
+                    // If there are more occurrences of "word" than expected
+                    while (seenWords[word] > wordFreq[word]) {
+                        string leftWord = s.substr(left, wordLength);
+                        --seenWords[leftWord];
+                        --count;
+                        left += wordLength;
+                    }
+                    // If all words match
+                    if (count == wordCount) {
+                        indices.push_back(left);
+                        string leftWord = s.substr(left, wordLength);
+                        --seenWords[leftWord];
+                        --count;
+                        left += wordLength;
+                    }
+                } else {
+                    // Reset if the word is not in words
+                    seenWords.clear();
+                    count = 0;
+                    left = j + wordLength;
+                }
+            }
+        }
+        return indices;
     }
 };
 
 int main( )
 {
     Solution so;
-    string s = "barfoothefoobarman";
-    vector<string> words = { "foo","bar" };
+    string s = "wordgoodgoodgoodbestword";
+    vector<string> words = { "word","good","best","word" };
     for (auto i : so.findSubstring(s, words))
         cout << i << " ";
+    cout<<endl;
 }
