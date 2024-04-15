@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
-
-int dp[5001][5001];
+int dp[4][7];
+// int dp[5001][5001];
 int w[5001];
 int v[5001];
 
@@ -58,8 +58,8 @@ int main( )
     int m, n, ans;
     scanf("%d %d", &m, &n);
 
-    // ans = twoDim(m, n);
-    ans = oneDim(m, n);
+    ans = twoDim(m, n);
+    // ans = oneDim(m, n);
 
     printf("%d\n", ans);
     return 0;
@@ -68,4 +68,9 @@ int main( )
 3 4
 1 3 4
 15 20 30
+
+4 6
+3 4 5 3
+3 1 6 7
+
 */
